@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <h1 class="app-name">{{ app_name }}</h1>
+    </header>
+
+    <main class="container">
+        {% if mode == "error" %}
+        <section class="alert alert-error" role="alert">
+            <strong>Ops!</strong> {{ error_message }}
+        </section>
+
+        {% elif mode == "create" %}
+        <section class="empty-state">
+            <div class="avatar avatar-placeholder" aria-hidden="true">+</div>
+            <h2>Nenhum perfil encontrado</h2>
+            <p>Ainda nao existe um perfil cadastrado. Crie o seu agora.</p>
+            <a class="btn btn-primary" href="{{ url_for('edit') }}">Criar perfil</a>
+        </section>
+
+        {% elif mode == "card" %}
+        <section class="profile-card">
+            {% if has_photo %}
+            <img class="avatar" src="{{ url_for('photo') }}" alt="Foto de {{ profile.name }}">
+            {% else %}
+            <div class="avatar avatar-placeholder" aria-hidden="true">
+                {{ (profile.name or '?')[0] | upper }}
+            </div>
+            {% endif %}
+
+            <h2 class="profile-name">{{ profile.name }}</h2>
+            {% if profile.profession %}
+            <p class="profile-profession">{{ profile.profession }}</p>
+            {% endif %}
+            {% if profile.city %}
+            <p class="profile-city">{{ profile.city }}</p>
+            {% endif %}
+
+            <dl class="profile-details">
+                <dt>E-mail</dt>
+                <dd>{{ profile.email }}</dd>
+
+                {% if profile.bio %}
+                <dt>Bio</dt>
+                <dd>{{ profile.bio }}</dd>
+                {% endif %}
+
+                {% if profile.interests %}
+                <dt>Interesses</dt>
+                <dd>
+                    <ul class="tags">
+                        {% for item in profile.interests %}
+                        <li class="tag">{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </dd>
+                {% endif %}
+            </dl>
+
+            <a class="btn btn-primary" href="{{ url_for('edit') }}">Editar perfil</a>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer class="footer">
+        <small>Laboratorio AWS VPC Endpoints &middot; Gateway (S3/DynamoDB) + Interface (Secrets/Logs/SSM)</small>
+    </footer>
+</body>
+</html>
