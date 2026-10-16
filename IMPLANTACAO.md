@@ -86,6 +86,8 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
 
 **Como validar:** a VPC `VPC-LAB` aparece na lista com estado **Available** e CIDR `10.0.0.0/16`.
 
+![Descrição da imagem](<imagens/imagem%20(4).png>)
+
 ---
 
 ## Etapa 2 — Subnets (2 públicas + 1 privada)
@@ -124,6 +126,8 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
 
 **Como validar:** as três subnets aparecem **Available**; `SUBNET-PUB-A` e `SUBNET-PRIV` em `us-east-1a`, `SUBNET-PUB-B` em `us-east-1b`, todas em `VPC-LAB`. As duas públicas têm *auto-assign public IPv4* habilitado; a privada não.
 
+![Descrição da imagem](<imagens/imagem%20(5).png>)
+
 ---
 
 ## Etapa 3 — Internet Gateway
@@ -143,6 +147,7 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
 
 **Como validar:** o `IGW-LAB` aparece com estado **Attached** e associado à `VPC-LAB`.
 
+![Descrição da imagem](<imagens/imagem%20(7).png>)
 ---
 
 ## Etapa 4 — Route Tables
@@ -168,6 +173,7 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
 
 **Como validar:** `SUBNET-PUB-A` e `SUBNET-PUB-B` estão associadas à `RT-PUB` (com rota para o `IGW-LAB`); `SUBNET-PRIV` está associada à `RT-PRIV`. Após a Etapa 5, a `RT-PRIV` mostra a rota `0.0.0.0/0 -> nat-...`.
 
+![Descrição da imagem](<imagens/imagem%20(6).png>)
 ---
 
 ## Etapa 5 — NAT Gateway + Elastic IP
@@ -188,7 +194,8 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
 7. Quando o NAT ficar **Available**, volte à Etapa 4 e conclua a rota `0.0.0.0/0 -> NAT-LAB` em `RT-PRIV`.
 
 **Como validar:** o `NAT-LAB` fica **Available** com um Elastic IP associado; a `RT-PRIV` passa a conter a rota `0.0.0.0/0 -> nat-...`.
-
+![Descrição da imagem](<imagens/imagem%20(8).png>)
+![Descrição da imagem](<imagens/imagem%20(9).png>)
 ---
 
 ## Etapa 6 — Security Groups
@@ -220,7 +227,7 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
    - *Outbound*: mantenha o padrão.
 
 **Como validar:** cada SG mostra exatamente as regras acima. Confirme que `SG-EC2` **não** possui regra de entrada na porta 22.
-
+![Descrição da imagem](<imagens/imagem%20(10).png>)
 ---
 
 ## Etapa 7 — IAM Role + Instance Profile (menor privilégio)
@@ -300,9 +307,10 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
   }]
 }
 ```
+![Descrição da imagem](<imagens/imagem%20(12).png>)
 
 **Como validar:** a Role `ROLE-EC2-LAB` existe, possui as policies acima e a `AmazonSSMManagedInstanceCore`, e tem um Instance Profile associado (visível na criação da EC2 na Etapa 14).
-
+![Descrição da imagem](<imagens/imagem%20(11).png>)
 ---
 
 ## Etapa 8 — S3 bucket privado
@@ -325,6 +333,7 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
 
 **Como validar:** o bucket aparece com *Access: Bucket and objects not public*. **Lembre-se de ajustar `BUCKET_NAME` em `app/config.py`** com este nome (atualmente o placeholder é `aws-vpc-endpoints-lab-REPLACE-ME`) — ver Etapa 15.
 
+![Descrição da imagem](<imagens/imagem%20(13).png>)
 ---
 
 ## Etapa 9 — DynamoDB tabela `profiles`
@@ -346,7 +355,7 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
 8. Clique em **Create table**.
 
 **Como validar:** a tabela `profiles` fica **Active**, com partition key `profileId (String)`.
-
+![Descrição da imagem](<imagens/imagem%20(14).png>)
 ---
 
 ## Etapa 10 — Secrets Manager (segredo da aplicação)
@@ -369,7 +378,7 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
 6. *Automatic rotation*: **desabilitada** (não necessária no laboratório) > **Next** > **Store**.
 
 **Como validar:** o segredo aparece com o nome exato e, ao **Retrieve secret value**, mostra `APP_NAME` e `APP_ENV`.
-
+![Descrição da imagem](<imagens/imagem%20(15).png>)
 ---
 
 ## Etapa 11 — Gateway Endpoint do S3 (`VPCE-S3`)
@@ -392,6 +401,8 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
 
 **Como validar:** o endpoint `VPCE-S3` fica **Available** e a `RT-PRIV` passa a mostrar uma rota para a **prefix list** do S3 (`pl-...`) apontando para o endpoint (`vpce-...`). **Observe que não há Security Group associado** — Gateway Endpoints são controlados por rota.
 
+![Descrição da imagem](<imagens/imagem%20(16).png>)
+![Descrição da imagem](<imagens/imagem%20(18).png>)
 ---
 
 ## Etapa 12 — Gateway Endpoint do DynamoDB (`VPCE-DYNAMODB`)
@@ -413,7 +424,7 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
 8. Clique em **Create endpoint**.
 
 **Como validar:** o endpoint `VPCE-DYNAMODB` fica **Available** e a `RT-PRIV` mostra a rota da **prefix list** do DynamoDB apontando para o `vpce-...`. Novamente, **sem Security Group**.
-
+![Descrição da imagem](<imagens/imagem%20(17).png>)
 ---
 
 ## Etapa 13 — Interface Endpoints (Secrets Manager, Logs e SSM)
@@ -443,6 +454,9 @@ Defina as tags `Name` exatamente como abaixo para facilitar a navegação no Con
 8. *Security groups*: selecione **`SG-INTERFACE-ENDPOINTS`** (desmarque o `default` se vier selecionado).
 9. *Policy*: **Full access** nesta fase.
 10. Clique em **Create endpoint**.
+
+![Descrição da imagem](<imagens/imagem%20(19).png>)
+![Descrição da imagem](<imagens/imagem%20(20).png>)
 
 **Como validar:** cada Interface Endpoint fica **Available**, mostra uma **ENI** com IP privado na `SUBNET-PRIV`, tem o `SG-INTERFACE-ENDPOINTS` associado e *Private DNS* habilitado. A partir da EC2 (após a Etapa 14), `nslookup secretsmanager.us-east-1.amazonaws.com` deve resolver para um IP privado `10.0.2.x`.
 
@@ -592,11 +606,13 @@ sudo systemctl status profile-app
    - *Register targets*: selecione a instância **`EC2-APP-LAB`**, defina *Ports for the selected instances* = `5000`, clique em **Include as pending below** > **Create target group**.
 8. Volte à aba do ALB, atualize a lista de Target Groups e selecione **`TG-APP-5000`** como ação padrão do listener HTTP 80.
 9. Clique em **Create load balancer**.
+![Descrição da imagem](<imagens/imagem%20(22).png>)
 
 **Como validar:** em **EC2 > Target Groups > `TG-APP-5000` > Targets**, o alvo `EC2-APP-LAB` aparece como **healthy** (pode levar 1–2 minutos). Abrir `http://<DNS-do-ALB>/` no navegador exibe o formulário de criação de perfil (ou o cartão, se já criado). Se ficar **unhealthy**, confira a seção de Solução de problemas (porta 5000, `SG-EC2`, path `/health`).
 
 > **Sem HTTPS/ACM:** o laboratório usa apenas o listener **HTTP 80**. Não adicione listener 443 nem certificado ACM.
 
+![Descrição da imagem](<imagens/imagem%20(21).png>)
 ---
 
 ## Etapa 17 — CloudWatch Logs
@@ -614,7 +630,21 @@ sudo systemctl status profile-app
 
 **Como validar:** o log group existe e o stream `app-events` contém pelo menos o evento `APPLICATION_STARTED` (gerado no startup) e, após usar a aplicação, eventos como `PROFILE_CREATED`.
 
+![Descrição da imagem](<imagens/imagem%20(23).png>)
+
 ---
+
+![Descrição da imagem](<imagens/imagem%20(24).png>)
+
+
+<p align="center">
+  <img src="imagens/imagem%20(28).png" width="30%" />
+  <img src="imagens/imagem%20(25).png" width="30%" />
+  <img src="imagens/imagem%20(26).png" width="30%" />
+</p>
+<p align="center">
+  <img src="imagens/imagem%20(27).png" width="30%" />
+</p>
 
 ## Etapa 18 — Teste funcional
 

@@ -1,4 +1,7 @@
-# VPC Endpoints na prática: uma aplicação Flask que acessa a AWS sem passar pela internet
+# VPC Endpoints: Acesso privado a serviços AWS sem passar pela internet
+
+
+![Descrição da imagem](<imagens/imagem%20(1).png>)
 
 Em muitos ambientes de nuvem, o acesso aos serviços gerenciados da AWS — guardar um arquivo no S3, ler um registro no DynamoDB, buscar uma senha no Secrets Manager — acontece pela internet: o tráfego sai da rede, passa por um NAT Gateway e volta pela porta pública do serviço. Funciona, mas nem sempre é o ideal. Às vezes queremos uma rede fechada, menos custo de NAT ou um caminho privado e auditável até a AWS.
 
@@ -14,6 +17,8 @@ flowchart LR
     ec2 -->|Interface Endpoints| intf[Secrets · Logs · SSM]
 ```
 
+![Descrição da imagem](<imagens/imagem%20(2).png>)
+
 ## Os dois tipos de VPC Endpoint
 
 O objetivo central é mostrar que existem **dois tipos de VPC Endpoint**, com funcionamento tecnicamente diferente. Essa distinção costuma ser decorada em provas, mas raramente vista acontecendo — aqui ela é o fio condutor do exercício.
@@ -27,6 +32,8 @@ O objetivo central é mostrar que existem **dois tipos de VPC Endpoint**, com fu
 | Custo | Gratuito | Por hora e por volume |
 
 A diferença essencial — **rota** versus **interface de rede** — é o que o laboratório pretende fixar pela experiência direta.
+
+![Descrição da imagem](<imagens/imagem%20(29).png>)
 
 ## A aplicação de exemplo
 
@@ -44,6 +51,17 @@ O ALB exige subnets em **duas Availability Zones**, mesmo que a aplicação use 
 
 O acesso administrativo segue a mesma lógica fechada: sem SSH, sem bastion, sem chaves — apenas **Session Manager**, viabilizado pelos Interface Endpoints do SSM. As credenciais da aplicação nunca aparecem em código: a EC2 assume uma **IAM Role** de menor privilégio, restrita ao bucket do lab, à tabela `profiles`, ao segredo e ao log group do projeto.
 
+![Descrição da imagem](<imagens/imagem%20(24).png>)
+
+
+<p align="center">
+  <img src="imagens/imagem%20(28).png" width="30%" />
+  <img src="imagens/imagem%20(25).png" width="30%" />
+  <img src="imagens/imagem%20(26).png" width="30%" />
+</p>
+<p align="center">
+  <img src="imagens/imagem%20(27).png" width="30%" />
+</p>
 ## O experimento central: desligar a internet
 
 Durante a montagem, a instância tem saída para a internet por um **NAT Gateway**, necessário no início para instalar pacotes e registrar o agente do SSM. O aprendizado vem ao removê-lo: na etapa final, você apaga a rota `0.0.0.0/0 → NAT` da route table privada.
