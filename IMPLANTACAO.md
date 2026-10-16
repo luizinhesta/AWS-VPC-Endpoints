@@ -1,4 +1,4 @@
-# Guia de Implantação Manual no Console AWS — `IMPLANTACAO.md`
+# Guia de Implantação Manual - VPC Endpoints: Acesso privado a serviços AWS sem passar pela internet
 
 Passo a passo **manual** para montar toda a infraestrutura do laboratório **AWS VPC Endpoints** no **Console AWS**, na região **`us-east-1`**. A aplicação roda em uma **única EC2 privada** (sem alta disponibilidade). A única exceção à "AZ única" é a **segunda subnet pública**, criada apenas porque o Application Load Balancer (ALB) exige subnets em **duas Availability Zones distintas** — ela não hospeda recursos de aplicação.
 

@@ -1,4 +1,4 @@
-# Arquitetura do Laboratório — `ARQUITETURA.md`
+# Arquitetura do Laboratório - VPC Endpoints: Acesso privado a serviços AWS sem passar pela internet
 
 Este documento descreve **exclusivamente a arquitetura que já existe** no laboratório **AWS VPC Endpoints**, na região **`us-east-1`**. Nenhum componente aqui descrito é hipotético: todos correspondem aos recursos criados manualmente no Console AWS (ver [`IMPLANTACAO.md`](./IMPLANTACAO.md)) e ao código da aplicação (`app/`).
 
@@ -11,6 +11,8 @@ Este documento descreve **exclusivamente a arquitetura que já existe** no labor
 Demonstrar, na prática, a **diferença entre Gateway VPC Endpoints e Interface VPC Endpoints**, usando uma aplicação Flask simples (cartão de perfil) hospedada em uma **única EC2 privada**, exposta à internet apenas por um **Application Load Balancer (ALB) público**.
 
 O ponto central do laboratório é o experimento da Etapa 19 do `IMPLANTACAO.md`: ao remover a rota `0.0.0.0/0 -> NAT-LAB` da route table privada, a aplicação **continua funcionando** por meio dos VPC Endpoints (S3, DynamoDB, Secrets Manager, CloudWatch Logs e SSM/Session Manager), enquanto a saída geral para a internet deixa de existir.
+
+![Descrição da imagem](<imagens/imagem%20(2).png>)
 
 Características de escopo:
 
@@ -63,6 +65,8 @@ flowchart TB
 | Log group CloudWatch | `/aws-vpc-endpoints-lab/app` (stream `app-events`) | Eventos de domínio da aplicação |
 | Gateway Endpoints | `VPCE-S3`, `VPCE-DYNAMODB` | Acesso a S3 e DynamoDB por rota (prefix list) |
 | Interface Endpoints | `VPCE-SECRETSMANAGER`, `VPCE-LOGS`, `VPCE-SSM`, `VPCE-SSMMESSAGES`, `VPCE-EC2MESSAGES` | Acesso via ENI/PrivateLink na porta 443 |
+
+![Descrição da imagem](<imagens/imagem%20(29).png>)
 
 ### VPC e subnets
 
